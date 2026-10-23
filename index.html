@@ -1,0 +1,1383 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4faf8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ptasia Kropla">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="/manifest.webmanifest?v=2">
+  <link rel="apple-touch-icon" sizes="512x512" href="/apple-touch-icon.png?v=2">
+  <link rel="icon" type="image/png" sizes="512x512" href="/apple-touch-icon.png?v=2">
+  <title>Ptasia Kropla</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #173b43;
+      --muted: #607982;
+      --teal: #087f85;
+      --aqua: #168eaa;
+      --line: #dcebe9;
+      --paper: #fff;
+      --page: #f4faf8;
+      --green: #4c9564;
+      --amber: #a76c1d;
+      --red: #a94442;
+      --shadow: 0 18px 55px rgba(29, 91, 98, .08);
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 5% 8%, rgba(184, 235, 226, .45), transparent 30rem),
+        radial-gradient(circle at 94% 16%, rgba(186, 225, 247, .42), transparent 28rem),
+        var(--page);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    button, input { font: inherit; }
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid #168b9e;
+      outline-offset: 3px;
+    }
+    .shell { width: min(1400px, 100%); margin: auto; padding: 26px clamp(16px, 4vw, 56px) 24px; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding-bottom: 20px; border-bottom: 1px solid #d7e9e7;
+    }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark {
+      width: 52px; height: 52px; display: grid; place-items: center; flex: 0 0 auto;
+      overflow: hidden; border-radius: 17px; background: #dcf2ef;
+      box-shadow: 0 5px 16px rgba(29, 91, 98, .08);
+    }
+    .brand-mark img { width: 100%; height: 100%; object-fit: cover; }
+    .brand-kicker, .eyebrow {
+      margin: 0; color: var(--teal); font-size: 11px; font-weight: 800;
+      letter-spacing: .18em; text-transform: uppercase;
+    }
+    h1, h2, .big-number, .metric-number { font-family: Georgia, "Times New Roman", serif; }
+    h1 { margin: 2px 0 0; font-size: 27px; line-height: 1.05; }
+    .top-status { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+    .badge, .pill {
+      display: inline-flex; align-items: center; gap: 8px; border-radius: 999px;
+      padding: 9px 14px; font-size: 13px; font-weight: 750;
+      background: #fff; border: 1px solid var(--line); color: var(--muted);
+    }
+    .badge::before, .pill::before {
+      content: ""; width: 8px; height: 8px; border-radius: 50%; background: #aab9bb;
+    }
+    .badge.ok, .pill.ok { color: #34784e; background: #edf7ef; border-color: #d7ebdc; }
+    .badge.ok::before, .pill.ok::before { background: #53a66d; }
+    .badge.warn, .pill.warn { color: #8b5b19; background: #fff7e9; border-color: #f0dfbd; }
+    .badge.warn::before, .pill.warn::before { background: #d39136; }
+    .badge.error, .pill.error { color: #984745; background: #fff0ef; border-color: #f0d7d5; }
+    .badge.error::before, .pill.error::before { background: #c75c58; }
+    .plain-button {
+      border: 1px solid var(--line); border-radius: 999px; padding: 9px 13px;
+      background: #fff; color: var(--teal); font-size: 13px; font-weight: 750; cursor: pointer;
+    }
+    .plain-button:disabled { opacity: .6; cursor: wait; }
+    .hero { position: relative; padding: 36px 0 28px; }
+    .hero::after {
+      content: "🌿"; position: absolute; top: 12px; right: 5%;
+      font-size: clamp(44px, 7vw, 82px); opacity: .45; transform: rotate(-18deg);
+    }
+    .hero h2 { max-width: 720px; margin: 8px 0 0; font-size: clamp(36px, 5vw, 56px); line-height: 1.08; letter-spacing: -.035em; }
+    .hero-copy { max-width: 650px; margin: 12px 0 0; color: var(--muted); line-height: 1.65; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 20px; }
+    .refresh {
+      display: inline-flex; align-items: center; gap: 9px; border: 0; border-radius: 13px;
+      padding: 12px 17px; color: white; background: var(--teal); font-weight: 800;
+      cursor: pointer; box-shadow: 0 7px 18px rgba(8, 127, 133, .18);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .refresh:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(8, 127, 133, .24); }
+    .refresh:disabled { opacity: .65; cursor: wait; }
+    .last-read { color: var(--muted); font-size: 13px; }
+    .last-read strong { color: var(--ink); }
+    .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; }
+    .card {
+      position: relative; overflow: hidden; min-width: 0; padding: 24px;
+      border: 1px solid var(--line); border-radius: 25px; background: rgba(255,255,255,.95);
+      box-shadow: var(--shadow);
+    }
+    .water-card { grid-column: span 6; }
+    .tds-card, .sensor-card { grid-column: span 3; }
+    .connection-card { grid-column: span 4; }
+    .alert-card { grid-column: span 8; }
+    .history-card { grid-column: span 12; }
+    .card-head { display: flex; align-items: center; gap: 12px; }
+    .card-icon {
+      width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto;
+      border-radius: 15px; background: #e3f5f6; font-size: 21px;
+    }
+    .card-icon.green { background: #edf5e9; }
+    .card-icon.blue { background: #e8f3fa; }
+    h3 { margin: 0; font-size: 17px; line-height: 1.3; }
+    .water-body { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-top: 28px; }
+    .big-number { color: var(--teal); font-size: clamp(60px, 8vw, 92px); line-height: .92; letter-spacing: -.04em; }
+    .percent { margin-left: 4px; color: var(--teal); font: 700 27px Georgia, serif; }
+    .metric-caption { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+    .depth-box { display: inline-flex; gap: 5px; align-items: baseline; margin-top: 18px; padding: 10px 13px; border-radius: 12px; background: #edf8f7; color: var(--muted); font-size: 13px; }
+    .depth-box strong { color: var(--teal); font-size: 16px; }
+    .gauge-wrap { display: flex; align-items: stretch; gap: 8px; flex: 0 0 auto; }
+    .gauge-labels { display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0; color: #66848c; font-size: 11px; font-weight: 700; text-align: right; }
+    .gauge { position: relative; width: 54px; height: 166px; overflow: hidden; border: 1px solid #cce8e8; border-radius: 17px; background: #e6f4f4; }
+    .gauge-fill { position: absolute; inset: auto 0 0; height: 0; border-radius: 0 0 16px 16px; background: linear-gradient(180deg, #60d5db, #148eaa); transition: height .5s ease; }
+    .gauge-fill::before { content: ""; position: absolute; top: -7px; left: -10%; width: 120%; height: 14px; border-radius: 50%; background: #8be0df; }
+    .metric-number { margin: 22px 0 0; font-size: clamp(43px, 5vw, 60px); line-height: .95; }
+    .unit { color: var(--muted); font-weight: 700; }
+    .note { margin: 18px 0 0; padding-top: 15px; border-top: 1px solid #e4eeed; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .tds-scale { margin-top: 18px; }
+    .tds-scale-title { margin: 0; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .tds-scale-track { position: relative; height: 16px; margin: 10px 4px 7px; overflow: hidden; border: 1px solid rgba(23,59,67,.18); border-radius: 99px; background: #edf3f2; }
+    .tds-color-steps { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); width: 100%; height: 100%; }
+    .tds-color-steps span:nth-child(1), .tds-legend-swatches span:nth-child(1) { background: #27864b; }
+    .tds-color-steps span:nth-child(2), .tds-legend-swatches span:nth-child(2) { background: #45a65a; }
+    .tds-color-steps span:nth-child(3), .tds-legend-swatches span:nth-child(3) { background: #69b95b; }
+    .tds-color-steps span:nth-child(4), .tds-legend-swatches span:nth-child(4) { background: #8fc34f; }
+    .tds-color-steps span:nth-child(5), .tds-legend-swatches span:nth-child(5) { background: #b8cb48; }
+    .tds-color-steps span:nth-child(6), .tds-legend-swatches span:nth-child(6) { background: #d9c94a; }
+    .tds-color-steps span:nth-child(7), .tds-legend-swatches span:nth-child(7) { background: #e9b33d; }
+    .tds-color-steps span:nth-child(8), .tds-legend-swatches span:nth-child(8) { background: #e88737; }
+    .tds-color-steps span:nth-child(9), .tds-legend-swatches span:nth-child(9) { background: #dc5d3f; }
+    .tds-color-steps span:nth-child(10), .tds-legend-swatches span:nth-child(10) { background: #bd3440; }
+    .tds-danger-zone { position: absolute; z-index: 2; top: 0; bottom: 0; background: rgba(74,0,15,.62); pointer-events: none; }
+    .tds-threshold-marker { position: absolute; z-index: 3; top: -3px; bottom: -3px; left: 0; border-left: 2px dashed #4a0010; pointer-events: none; }
+    .tds-marker { position: absolute; z-index: 4; top: -3px; left: 0; width: 5px; height: 20px; transform: translateX(-50%); border: 2px solid #fff; border-radius: 4px; background: #173b43; box-shadow: 0 0 0 1px rgba(23,59,67,.35); visibility: hidden; }
+    .tds-scale-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; }
+    .tds-threshold-control { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; font-size: 12px; }
+    .tds-threshold-control strong { color: var(--ink); }
+    .tds-assessment { display: inline-block; margin: 12px 0 0; padding: 6px 9px; border-radius: 12px; background: #f0f4f4; color: #607982; font-size: 11px; font-weight: 800; line-height: 1.4; }
+    .tds-assessment.low { background: #edf7ef; color: #34784e; }
+    .tds-assessment.medium { background: #fff7e9; color: #8b5b19; }
+    .tds-assessment.high { background: #fff0ef; color: #984745; }
+    .tds-scale-note { margin: 8px 0 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .tds-legend { margin-top: 15px; padding-top: 12px; border-top: 1px solid #e4eeed; }
+    .tds-legend-title { margin: 0 0 7px; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .tds-legend-swatches { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+    .tds-legend-swatches span { display: grid; place-items: center; height: 20px; border-radius: 4px; color: #fff; font-size: 9px; font-weight: 800; text-shadow: 0 1px 2px rgba(0,0,0,.55); }
+    .tds-legend-swatches span:nth-child(4), .tds-legend-swatches span:nth-child(5), .tds-legend-swatches span:nth-child(6), .tds-legend-swatches span:nth-child(7) { color: #173b43; text-shadow: none; }
+    .tds-legend-ends { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .tds-legend-ends span:last-child { text-align: right; }
+    .sensor-list { display: grid; gap: 13px; margin-top: 19px; }
+    .sensor-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #e4eeed; font-size: 13px; }
+    .sensor-row:last-child { padding-bottom: 0; border-bottom: 0; }
+    .pill { padding: 6px 10px; font-size: 11px; }
+    .connection-detail { margin-top: 20px; padding: 15px; border-radius: 17px; background: #f2f8f7; }
+    .connection-detail p { margin: 0; }
+    .connection-detail .label { color: var(--muted); font-size: 12px; }
+    .connection-detail .value { margin-top: 5px; font-weight: 800; overflow-wrap: anywhere; }
+    .connection-detail .battery { margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .alert-layout { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+    .alert-copy { display: flex; align-items: flex-start; gap: 13px; }
+    .alert-icon { width: 44px; height: 44px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 15px; background: #eaf5ed; font-size: 20px; }
+    .alert-icon.warn { background: #fff0dc; }
+    .alert-message { margin: 7px 0 0; color: var(--muted); line-height: 1.5; }
+    .threshold-control { flex: 0 0 auto; }
+    .threshold-control label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 750; }
+    .threshold-input { width: 88px; padding: 9px 10px; border: 1px solid #cbdedc; border-radius: 11px; color: var(--ink); }
+    .panel-alerts { display: grid; gap: 11px; margin: 0 0 20px; }
+    .panel-alerts[hidden], .panel-alert[hidden] { display: none !important; }
+    .panel-alert { display: flex; align-items: flex-start; gap: 13px; padding: 16px 18px; border: 1px solid #efc879; border-radius: 18px; background: #fff8e9; box-shadow: 0 8px 24px rgba(29,91,98,.06); }
+    .panel-alert.quality-alert { border-color: #e4a1a1; background: #fff1f0; }
+    .panel-alert-icon { flex: 0 0 auto; font-size: 22px; line-height: 1.2; }
+    .panel-alert h3 { margin: 0; font-size: 15px; }
+    .panel-alert p { margin: 5px 0 0; color: #5f6262; font-size: 13px; line-height: 1.5; }
+    .threshold-settings { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 20px; }
+    .threshold-settings .threshold-control { min-width: 180px; }
+    .threshold-help { margin: 18px 0 0; color: var(--muted); font-size: 12px; }
+    .notify-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .notify-status { max-width: 620px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .chart-wrap { height: 250px; margin-top: 10px; }
+    canvas { display: block; width: 100%; height: 100%; }
+    .chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+    .legend-dot { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 50%; background: #0a91a4; }
+    .legend-dot.green { background: #74a783; }
+    .waterers-section { margin: 4px 0 22px; }
+    .waterers-heading { display: flex; justify-content: space-between; align-items: end; gap: 14px; margin-bottom: 13px; }
+    .waterers-heading h2 { margin: 0; font-size: 23px; }
+    .waterers-heading p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .waterer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .waterer-card { position: relative; min-width: 0; padding: 19px; border: 1px solid var(--line); border-radius: 21px; background: rgba(255,255,255,.96); box-shadow: var(--shadow); }
+    .waterer-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .waterer-title-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .waterer-lamp { width: 13px; height: 13px; flex: 0 0 auto; border: 2px solid #a4b4b4; border-radius: 50%; background: #dfe8e7; }
+    .waterer-card.identifying .waterer-lamp { border-color: #e1a52e; background: #ffd766; box-shadow: 0 0 0 5px rgba(255,215,102,.2); animation: lamp-blink .55s infinite alternate; }
+    @keyframes lamp-blink { to { opacity: .25; transform: scale(.75); } }
+    .waterer-title { overflow-wrap: anywhere; margin: 0; font-size: 16px; }
+    .waterer-kind { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .waterer-menu { position: relative; flex: 0 0 auto; }
+    .waterer-menu summary { display: grid; width: 35px; height: 35px; place-items: center; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: var(--ink); font-size: 22px; line-height: 1; cursor: pointer; list-style: none; }
+    .waterer-menu summary::-webkit-details-marker { display: none; }
+    .waterer-menu-content { position: absolute; z-index: 5; top: 40px; right: 0; width: 200px; padding: 7px; border: 1px solid var(--line); border-radius: 13px; background: #fff; box-shadow: 0 12px 28px rgba(23,59,67,.14); }
+    .waterer-identify { width: 100%; padding: 10px; border: 0; border-radius: 9px; background: #edf8f7; color: var(--teal); font-weight: 800; text-align: left; cursor: pointer; }
+    .waterer-rename { width: 100%; margin-top: 5px; padding: 10px; border: 0; border-radius: 9px; background: #f3f8f7; color: var(--ink); font-weight: 750; text-align: left; cursor: pointer; }
+    .waterer-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 18px; }
+    .waterer-metric { padding: 11px; border-radius: 13px; background: #f4f9f8; }
+    .waterer-metric span { display: block; color: var(--muted); font-size: 11px; }
+    .waterer-metric strong { display: block; margin-top: 4px; font-size: 20px; }
+    .waterer-note { min-height: 31px; margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .waterer-note.warning { color: #963f42; font-weight: 750; }
+    .waterer-open { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 42px; margin-top: 14px; padding: 10px 14px; border: 0; border-radius: 11px; background: var(--teal); color: #fff; font-weight: 800; cursor: pointer; }
+    .waterer-dialog { width: min(500px, calc(100% - 28px)); max-width: 500px; padding: 0; overflow: visible; border: 1px solid var(--line); border-radius: 23px; color: var(--ink); background: #fff; box-shadow: 0 24px 80px rgba(23,59,67,.24); }
+    .waterer-dialog::backdrop { background: rgba(19,44,48,.42); backdrop-filter: blur(3px); }
+    .waterer-dialog[open] { animation: dialog-rise .18s ease-out both; }
+    @keyframes dialog-rise { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .waterer-dialog-content { padding: clamp(20px, 5vw, 28px); }
+    .waterer-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .waterer-dialog-heading h2 { margin: 0; font-size: 24px; }
+    .waterer-dialog-heading p { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .waterer-dialog-close { width: 36px; height: 36px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 50%; background: #fff; color: var(--muted); font-size: 22px; cursor: pointer; }
+    .waterer-dialog-fields { display: grid; gap: 14px; margin-top: 22px; }
+    .waterer-dialog-label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .waterer-dialog-label input { width: 100%; min-width: 0; padding: 12px 13px; border: 1px solid #cbdedc; border-radius: 12px; color: var(--ink); background: #fff; font-weight: 500; }
+    .waterer-dialog-message { min-height: 20px; margin: 12px 0 0; color: #984745; font-size: 13px; line-height: 1.45; }
+    .waterer-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .waterer-dialog-actions button { min-height: 42px; padding: 10px 15px; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: var(--teal); font-weight: 800; cursor: pointer; }
+    .waterer-dialog-actions .waterer-dialog-save { border-color: var(--teal); background: var(--teal); color: #fff; }
+    .waterer-dialog-actions button:disabled { opacity: .6; cursor: wait; }
+    .screen-reader-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .overview-shell { width: min(1150px, 100%); margin: 0 auto; padding: 26px 16px 38px; }
+    .overview-heading { margin: 34px 0 20px; }
+    .overview-heading h2 { margin: 0; font-size: clamp(28px, 5vw, 42px); }
+    .overview-heading p { margin: 8px 0 0; color: var(--muted); }
+    .admin-shell { width: min(920px, 100%); margin: 0 auto; padding: 24px 16px 34px; }
+    .admin-topbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 21px; }
+    .admin-topbar h1 { margin: 0; font-size: 25px; }
+    .admin-card { margin: 14px 0; padding: clamp(19px, 4vw, 28px); border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,.96); box-shadow: var(--shadow); }
+    .admin-card h2 { margin: 0; font-size: 21px; }
+    .admin-card > p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 18px; }
+    .admin-field { display: grid; align-content: start; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .admin-field input { width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid #cbdedc; border-radius: 11px; color: var(--ink); background: #fff; font-weight: 500; }
+    .admin-check { display: flex; align-items: center; gap: 9px; margin-top: 15px; color: var(--ink); font-size: 13px; }
+    .admin-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+    .admin-action { min-height: 42px; padding: 10px 15px; border: 0; border-radius: 11px; background: var(--teal); color: #fff; font-weight: 800; cursor: pointer; }
+    .admin-action.secondary { border: 1px solid var(--line); background: #fff; color: var(--teal); }
+    .admin-message { min-height: 20px; margin: 12px 0 0; color: var(--green); font-size: 13px; }
+    .admin-warning { padding: 12px 14px; border-radius: 13px; background: #fff8eb; color: #78561f !important; }
+    .session-label { display: inline-block; margin-left: 6px; padding: 4px 7px; border-radius: 99px; background: #edf5e9; color: #4c7d51; font-size: 10px; font-weight: 800; }
+    @media (max-width: 520px) { .admin-form-grid { grid-template-columns: 1fr; } .waterers-heading { align-items: flex-start; flex-direction: column; } }
+    .footer { padding: 24px 0 4px; color: var(--muted); font-size: 12px; line-height: 1.6; text-align: center; }
+
+    /* Instrukcja instalacji */
+    .guide {
+      min-height: 100vh; padding: 22px 16px 30px;
+      background:
+        radial-gradient(circle at 4% 8%, rgba(184,235,226,.5), transparent 27rem),
+        radial-gradient(circle at 95% 20%, rgba(186,225,247,.45), transparent 26rem),
+        #f4faf8;
+    }
+    .guide-inner { width: min(900px, 100%); margin: 0 auto; }
+    .guide-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .guide-header .brand-mark { width: 46px; height: 46px; }
+    .guide-header strong { font-family: Georgia, serif; font-size: 20px; }
+    .guide-card { padding: clamp(20px, 5vw, 38px); border: 1px solid var(--line); border-radius: 27px; background: rgba(255,255,255,.96); box-shadow: var(--shadow); }
+    .guide-progress { display: flex; gap: 6px; margin: 0 0 23px; }
+    .guide-progress span { height: 5px; flex: 1; border-radius: 99px; background: #e4efed; }
+    .guide-progress span.active { background: var(--teal); }
+    .guide-card h1 { max-width: 690px; margin: 7px 0 0; font-size: clamp(30px, 5vw, 43px); line-height: 1.12; }
+    .guide-copy { max-width: 690px; margin: 12px 0 0; color: var(--muted); line-height: 1.65; }
+    .guide-notice { margin-top: 17px; padding: 12px 14px; border: 1px solid #f0dfbd; border-radius: 13px; background: #fff8eb; color: #78561f; font-size: 13px; line-height: 1.5; }
+    .address-row { display: flex; gap: 8px; margin-top: 18px; }
+    .address-input { min-width: 0; flex: 1; padding: 13px 14px; border: 1px solid #cbdedc; border-radius: 13px; background: #f7fbfa; color: var(--ink); font-size: 14px; }
+    .copy-button, .guide-next, .guide-back, .version-button {
+      min-height: 43px; border: 0; border-radius: 12px; padding: 11px 16px;
+      font-weight: 800; cursor: pointer;
+    }
+    .copy-button, .guide-next { background: var(--teal); color: #fff; }
+    .guide-back, .version-button { border: 1px solid var(--line); background: #fff; color: var(--teal); }
+    .address-status { min-height: 20px; margin: 8px 0 0; color: var(--green); font-size: 13px; }
+    .version-picker { display: flex; gap: 9px; margin-top: 20px; }
+    .version-button.selected { border-color: var(--teal); background: #e6f5f2; box-shadow: inset 0 0 0 1px var(--teal); }
+    .tutorial-layout { margin-top: 26px; }
+    .step-copy { padding: 18px 20px; border: 1px solid var(--line); border-radius: 16px; background: #f7fbfa; color: var(--muted); line-height: 1.7; }
+    .step-copy strong { color: var(--ink); }
+    .step-copy ol { padding-left: 19px; }
+    .step-copy li { margin: 8px 0; }
+    .guide-brand { color: var(--teal); font-family: Georgia, serif; font-size: 22px; font-weight: 800; }
+    .guide-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; }
+    .guide-nav .right { display: flex; gap: 9px; }
+    .guide-footnote { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    @media (max-width: 900px) {
+      .water-card, .tds-card, .sensor-card, .connection-card, .alert-card { grid-column: span 6; }
+      .water-card, .history-card { grid-column: span 12; }
+      .hero::after { right: 2%; opacity: .3; }
+    }
+    @media (max-width: 650px) {
+      .shell { padding: 18px 14px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .top-status { justify-content: flex-start; }
+      .hero { padding: 28px 0 22px; }
+      .hero::after { top: 20px; right: 4px; font-size: 44px; }
+      .hero h2 { max-width: 85%; font-size: 38px; }
+      .grid { gap: 13px; }
+      .water-card, .tds-card, .sensor-card, .connection-card, .alert-card, .history-card { grid-column: span 12; }
+      .card { padding: 20px; border-radius: 21px; }
+      .water-body { margin-top: 23px; }
+      .gauge { height: 145px; width: 48px; }
+      .alert-layout { flex-direction: column; }
+      .threshold-control { width: 100%; }
+      .chart-wrap { height: 220px; }
+      .guide { padding: 14px 10px 22px; }
+      .guide-card { border-radius: 22px; }
+      .address-row { flex-direction: column; }
+      .copy-button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <section id="admin-page" class="admin-shell" hidden>
+    <header class="admin-topbar">
+      <div><p class="eyebrow">Ptasia Kropla</p><h1>Panel administratora</h1></div>
+      <button id="admin-home-button" class="plain-button" type="button">Panel główny</button>
+    </header>
+    <section id="admin-login-panel" class="admin-card">
+      <h2>Logowanie</h2>
+      <p>Panel demonstracyjny do ustawień testowych. Dodawanie prawdziwych poideł i zmiana nazw są dostępne bezpośrednio na panelu głównym.</p>
+      <form id="admin-login-form">
+        <div class="admin-form-grid">
+          <label class="admin-field">Login<input id="admin-username" autocomplete="username" required></label>
+          <label class="admin-field">Hasło<input id="admin-password" type="password" autocomplete="current-password" required></label>
+        </div>
+        <div class="admin-actions"><button class="admin-action" type="submit">Zaloguj</button></div>
+        <p id="admin-login-message" class="admin-message" role="status"></p>
+      </form>
+      <p class="admin-warning">To logowanie demonstracyjne do projektu szkolnego. Dane admin/admin są zapisane w stronie i nie zabezpieczają jej przed innymi osobami w tej samej sieci.</p>
+    </section>
+    <div id="admin-controls" hidden>
+      <section class="admin-card">
+        <h2>Dodaj poidło testowe <span class="session-label">tylko ta sesja</span></h2>
+        <p>To wirtualne poidło do demonstracji TDS, poziomu wody i trybu naturalnego. Znika po odświeżeniu strony; prawdziwe poidła dodasz przyciskiem „＋ Dodaj poidło” na zwykłym panelu.</p>
+        <form id="waterer-form">
+          <div class="admin-form-grid">
+            <label class="admin-field">Nazwa poidła<input id="waterer-name" maxlength="40" value="Poidło testowe" required></label>
+            <label class="admin-field">TDS (ppm)<input id="waterer-tds" type="number" min="0" max="10000" step="1" value="240" required></label>
+            <label class="admin-field">Wysokość wody (cm)<input id="waterer-depth" type="number" min="0" max="10" step="0.1" value="5" required></label>
+          </div>
+          <div class="admin-actions"><button id="waterer-natural-toggle" class="admin-action secondary" type="button" aria-pressed="false">Tryb naturalny: wyłączony</button></div>
+          <div class="admin-actions">
+            <button class="admin-action" type="submit">Zastosuj poidło na tę sesję</button>
+            <button id="stop-session-button" class="admin-action secondary" type="button">Stop — zakończ zmiany sesji</button>
+          </div>
+          <p id="admin-message" class="admin-message" role="status"></p>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <dialog id="waterer-dialog" class="waterer-dialog" aria-labelledby="waterer-dialog-title">
+    <form id="waterer-dialog-form" class="waterer-dialog-content">
+      <div class="waterer-dialog-heading">
+        <div><h2 id="waterer-dialog-title">Dodaj poidło</h2><p id="waterer-dialog-description">Dodaj Pico W działające w tej samej sieci Wi‑Fi. Urządzenie będzie widoczne pod wspólnym adresem centrali.</p></div>
+        <button id="waterer-dialog-close" class="waterer-dialog-close" type="button" aria-label="Zamknij">×</button>
+      </div>
+      <div class="waterer-dialog-fields">
+        <label class="waterer-dialog-label">Nazwa poidła<input id="waterer-dialog-name" maxlength="40" placeholder="Np. Poidło ogród" autocomplete="off" required></label>
+        <label id="waterer-dialog-ip-field" class="waterer-dialog-label">Lokalny adres IP Pico W<input id="waterer-dialog-ip" inputmode="decimal" placeholder="192.168.0.171" autocomplete="off"></label>
+      </div>
+      <p id="waterer-dialog-message" class="waterer-dialog-message" role="status" aria-live="polite"></p>
+      <div class="waterer-dialog-actions">
+        <button id="waterer-dialog-cancel" type="button">Anuluj</button>
+        <button id="waterer-dialog-save" class="waterer-dialog-save" type="submit">Dodaj poidło</button>
+      </div>
+    </form>
+  </dialog>
+  <p id="waterer-action-status" class="screen-reader-status" role="status" aria-live="polite"></p>
+
+  <section id="overview-page" class="overview-shell" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark"><img src="/apple-touch-icon.png?v=2" alt="Logo Ptasia Kropla"></span>
+        <div><p class="brand-kicker">Inteligentne poidełko</p><h1>Ptasia Kropla</h1></div>
+      </div>
+      <div class="top-status">
+        <span id="overview-device-count" class="badge">Połączone poidła</span>
+        <button id="overview-add-waterer" class="plain-button" type="button">＋ Dodaj poidło</button>
+        <button id="overview-admin" class="plain-button" type="button">Administracja</button>
+        <button id="overview-guide" class="plain-button" type="button">Jak dodać ikonę?</button>
+      </div>
+    </header>
+    <main>
+      <section class="overview-heading">
+        <p class="eyebrow">Panel główny</p>
+        <h2>Wszystkie poidła</h2>
+        <p>Wybierz poidełko, aby zobaczyć jego odczyty i sterować identyfikacją.</p>
+      </section>
+      <section id="waterer-list" class="waterer-grid" aria-label="Lista poideł" aria-live="polite"></section>
+    </main>
+  </section>
+
+  <section id="setup-guide" class="guide" hidden>
+    <div class="guide-inner">
+      <header class="guide-header"><strong class="guide-brand">Ptasia Kropla</strong></header>
+      <div class="guide-card">
+        <div id="guide-progress" class="guide-progress" aria-label="Postęp instrukcji"></div>
+        <p id="guide-eyebrow" class="eyebrow">Konfiguracja na iPhonie</p>
+        <h1 id="guide-title">Dodaj Ptasia Kropla do ekranu głównego</h1>
+        <p id="guide-copy" class="guide-copy"></p>
+        <p class="guide-notice"><strong>Uwaga:</strong> najpierw przejrzyj wszystkie kroki, a dopiero potem wykonuj je w Safari. iPhone i Pico W muszą być połączone z tą samą siecią Wi‑Fi.</p>
+        <div id="address-panel" hidden>
+          <div class="address-row">
+            <input id="site-address" class="address-input" type="text" readonly aria-label="Adres panelu">
+            <button id="copy-address" class="copy-button" type="button">Kopiuj adres</button>
+          </div>
+          <p id="address-status" class="address-status" aria-live="polite"></p>
+        </div>
+        <div id="version-panel" class="version-picker" hidden>
+          <button class="version-button" type="button" data-ios="26">iOS 26</button>
+          <button class="version-button" type="button" data-ios="27">iOS 27</button>
+        </div>
+        <div id="tutorial-layout" class="tutorial-layout" hidden><div id="step-copy" class="step-copy"></div></div>
+        <div class="guide-nav">
+          <button id="guide-back" class="guide-back" type="button">Wstecz</button>
+          <div class="right">
+            <button id="guide-next" class="guide-next" type="button">Dalej</button>
+          </div>
+        </div>
+        <p class="guide-footnote">Nazwy i położenie przycisków mogą się trochę różnić zależnie od wersji i ustawień Safari.</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="dashboard" class="shell" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark"><img src="/apple-touch-icon.png?v=2" alt="Logo Ptasia Kropla"></span>
+        <div><p class="brand-kicker">Inteligentne poidełko</p><h1>Ptasia Kropla</h1></div>
+      </div>
+      <div class="top-status">
+        <span id="device-status" class="badge">Łączenie z Pico W…</span>
+        <button id="detail-back-button" class="plain-button" type="button" hidden>Wszystkie poidła</button>
+        <button id="detail-add-waterer" class="plain-button" type="button">＋ Dodaj poidło</button>
+        <button id="detail-rename-waterer" class="plain-button" type="button">Zmień nazwę</button>
+        <button id="detail-identify-button" class="plain-button" type="button">Identyfikuj poidło</button>
+        <button id="show-admin" class="plain-button" type="button">Administracja</button>
+        <button id="show-guide" class="plain-button" type="button">Jak dodać ikonę?</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="welcome-title">
+        <p class="eyebrow">Panel poidełka · <strong id="detail-waterer-name">Poidło główne</strong></p>
+        <h2 id="welcome-title">Woda pod kontrolą.</h2>
+        <p class="hero-copy">Bieżące odczyty czujników Grove przesyłane bezpośrednio z Raspberry Pi Pico W przez lokalną sieć Wi‑Fi.</p>
+        <div class="hero-actions">
+          <button id="refresh-button" class="refresh" type="button"><span aria-hidden="true">↻</span> Odśwież odczyty</button>
+          <p class="last-read">Ostatni odczyt: <strong id="last-read" aria-live="polite">czekam na Pico W…</strong></p>
+        </div>
+      </section>
+
+      <section id="panel-alerts" class="panel-alerts" aria-label="Aktywne komunikaty" aria-live="polite" hidden>
+        <article id="water-alert" class="panel-alert" role="alert" hidden>
+          <span class="panel-alert-icon" aria-hidden="true">💧</span>
+          <div><h3 id="water-alert-title">Zajrzyj do poidełka</h3><p id="water-alert-message"></p></div>
+        </article>
+        <article id="tds-alert" class="panel-alert quality-alert" role="alert" hidden>
+          <span class="panel-alert-icon" aria-hidden="true">⚠️</span>
+          <div><h3 id="tds-alert-title">Sprawdź wodę w poidełku</h3><p id="tds-alert-message"></p></div>
+        </article>
+      </section>
+
+      <section class="grid" aria-label="Odczyty poidełka">
+        <article class="card water-card">
+          <div class="card-head"><span class="card-icon" aria-hidden="true">💧</span><h3>Poziom wody</h3></div>
+          <div class="water-body"><div>
+            <div><strong id="water-percent" class="big-number">—</strong><span class="percent">%</span></div>
+            <p id="water-caption" class="metric-caption">Oczekiwanie na czujnik poziomu…</p>
+            <p class="depth-box">Głębokość <strong id="water-depth">—</strong> cm <span>(skala do 10 cm)</span></p>
+          </div>
+          <div class="gauge-wrap" aria-hidden="true">
+            <div class="gauge-labels"><span>10 cm</span><span>5 cm</span><span>0 cm</span></div>
+            <div class="gauge"><div id="water-fill" class="gauge-fill"></div></div>
+          </div></div>
+        </article>
+
+        <article class="card tds-card">
+          <div class="card-head"><span class="card-icon" aria-hidden="true">〰️</span><h3>Odczyt TDS</h3></div>
+          <p class="metric-number"><strong id="tds-value">—</strong> <span class="unit">ppm</span></p>
+          <p id="tds-caption" class="note">Oczekiwanie na czujnik TDS…</p>
+          <div class="tds-scale" role="group" aria-label="Orientacyjna skala odczytu TDS">
+            <p class="tds-scale-title">Skala orientacyjna</p>
+            <div class="tds-scale-track" aria-hidden="true">
+              <div class="tds-color-steps"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div id="tds-danger-zone" class="tds-danger-zone" hidden></div>
+              <span id="tds-threshold-marker" class="tds-threshold-marker" hidden></span>
+              <span id="tds-marker" class="tds-marker"></span>
+            </div>
+            <div class="tds-scale-axis"><span>0 ppm</span><span>2000+ ppm</span></div>
+            <div class="tds-threshold-control" aria-label="Stały próg alarmu TDS">Alarm TDS od <strong>500 ppm</strong></div>
+            <p id="tds-assessment" class="tds-assessment" role="status" aria-live="polite">Oczekiwanie na odczyt…</p>
+            <p id="tds-scale-note" class="tds-scale-note">Ciemnoczerwony obszar zaczyna się od stałego progu 500 ppm. To punkt alarmowy projektu, nie diagnoza bezpieczeństwa wody dla ptaków.</p>
+          <div class="tds-legend" role="group" aria-label="Legenda skali kolorów">
+              <p class="tds-legend-title">Legenda kolorów — 10 poziomów TDS</p>
+              <div class="tds-legend-swatches" role="img" aria-label="Dziesięć kolorów: 1 zielony oznacza niższy TDS, 10 czerwony oznacza najwyższy TDS"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+              <div class="tds-legend-ends"><span>1 · zielony — lepsza jakość orientacyjnie</span><span>10 · czerwony — gorsza jakość orientacyjnie</span></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card sensor-card">
+          <div class="card-head"><span class="card-icon green" aria-hidden="true">◉</span><h3>Czujniki</h3></div>
+          <div class="sensor-list">
+            <div class="sensor-row"><span>Poziom wody</span><span id="level-sensor-status" class="pill">oczekuję</span></div>
+            <div class="sensor-row"><span>TDS</span><span id="tds-sensor-status" class="pill">oczekuję</span></div>
+          </div>
+          <p class="note">TDS szacuje ilość rozpuszczonych substancji. Nie wykrywa drobnoustrojów ani konkretnych zanieczyszczeń i sam nie potwierdza bezpieczeństwa wody.</p>
+        </article>
+
+        <article class="card connection-card">
+          <div class="card-head"><span class="card-icon blue" aria-hidden="true">⌁</span><h3>Połączenie</h3></div>
+          <p id="connection-description" class="metric-caption">Sprawdzam połączenie Pico W…</p>
+          <div class="connection-detail">
+            <p class="label">Wspólny adres panelu</p>
+            <p id="wifi-address" class="value">—</p>
+            <p id="battery-state" class="battery">Stan baterii: brak pomiaru</p>
+          </div>
+        </article>
+
+        <article class="card alert-card">
+          <div class="card-head"><span class="card-icon" aria-hidden="true">🔔</span><h3>Ustawienia komunikatów</h3></div>
+          <div class="threshold-settings">
+            <div class="threshold-control">
+              <label for="threshold">Ostrzeżenie przy poziomie poniżej</label>
+              <input id="threshold" class="threshold-input" type="number" min="0" max="10" step="0.5" value="2"> cm
+            </div>
+          </div>
+          <p id="tds-threshold-help" class="threshold-help">Próg alarmu TDS jest stały i wynosi 500 ppm. Komunikat zniknie po uzyskaniu prawidłowego odczytu poniżej tego progu.</p>
+          <div class="notify-row">
+            <span id="notification-status" class="notify-status" role="status">Powiadomienia systemowe nie są obecnie skonfigurowane.</span>
+          </div>
+        </article>
+
+        <article class="card history-card">
+          <div class="chart-head"><div>
+            <h3>Historia odczytów</h3>
+            <p class="metric-caption">Dane zbierane od chwili otwarcia panelu.</p>
+            <div class="chart-legend"><span><i class="legend-dot"></i>Poziom wody (cm)</span><span><i class="legend-dot green"></i>TDS (ppm)</span></div>
+          </div><span class="pill ok">odczyty na żywo</span></div>
+          <div class="chart-wrap"><canvas id="history-chart" role="img" aria-label="Wykres historii poziomu wody i odczytów TDS"></canvas></div>
+        </article>
+      </section>
+    </main>
+    <footer class="footer">Poziom wody pochodzi z czujnika Grove 10 cm. Bateria nie jest mierzona — moduł ładowarki TP4056 nie przekazuje Pico informacji o jej poziomie.</footer>
+  </div>
+
+  <script>
+    const byId = id => document.getElementById(id);
+    const history = [];
+    let currentReading = null;
+    let requestRunning = false;
+    let iosVersion = "26";
+    let guideStep = 0;
+    const guideStepCount = 8;
+    const TDS_SCALE_MAX = 2000;
+    const TDS_ALERT_THRESHOLD_PPM = 500;
+    let adminUnlocked = false;
+    let formNaturalMode = false;
+    let watererSerial = 1;
+    let watererDialogMode = "add";
+    let watererDialogTargetId = null;
+    let selectedWatererId = "pico-main";
+    let overviewShowing = false;
+    const waterers = [{ id: "pico-main", name: "Poidło główne", physical: true, ip: "", depth: null, tds: null, natural: false, identifying: false, identifyNote: "" }];
+
+    function getSaved(key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value === null ? fallback : value;
+      } catch (error) { return fallback; }
+    }
+
+    function showDashboard() {
+      try { localStorage.setItem("ptasia-kropla-guide-done", "1"); } catch (error) {}
+      showMainRoute();
+    }
+
+    function openGuide() {
+      byId("admin-page").hidden = true;
+      byId("overview-page").hidden = true;
+      byId("dashboard").hidden = true;
+      byId("setup-guide").hidden = false;
+      guideStep = 0;
+      renderGuide();
+    }
+
+    function formatPL(value, digits) {
+      if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+      return value.toLocaleString("pl-PL", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]));
+    }
+
+    function setPill(id, text, state) {
+      const element = byId(id);
+      element.textContent = text;
+      element.className = "pill" + (state ? " " + state : "");
+    }
+
+    function getSelectedWaterer() {
+      return waterers.find(item => item.id === selectedWatererId) || waterers[0];
+    }
+
+    function openWatererDialog(mode, id) {
+      const dialog = byId("waterer-dialog");
+      const waterer = mode === "rename" ? waterers.find(item => item.id === id) : null;
+      if (mode === "rename" && !waterer) return;
+      watererDialogMode = mode;
+      watererDialogTargetId = waterer ? waterer.id : null;
+      byId("waterer-dialog-title").textContent = mode === "add" ? "Dodaj poidło" : "Zmień nazwę poidła";
+      byId("waterer-dialog-description").textContent = mode === "add"
+        ? "Dodaj Pico W działające w tej samej sieci Wi‑Fi. Urządzenie będzie widoczne pod wspólnym adresem centrali."
+        : waterer.physical ? "Wpisz nową nazwę. Zostanie zapisana na centrali Pico W." : "Wpisz nową nazwę poidła testowego. Zmiana obowiązuje do odświeżenia strony.";
+      byId("waterer-dialog-ip-field").hidden = mode !== "add";
+      byId("waterer-dialog-ip").required = mode === "add";
+      byId("waterer-dialog-save").textContent = mode === "add" ? "Dodaj poidło" : "Zapisz nazwę";
+      byId("waterer-dialog-name").value = waterer ? waterer.name : "";
+      byId("waterer-dialog-ip").value = "";
+      byId("waterer-dialog-message").textContent = "";
+      byId("waterer-dialog-save").disabled = false;
+      if (!dialog.open) dialog.showModal();
+      window.setTimeout(() => byId("waterer-dialog-name").focus(), 0);
+    }
+
+    async function submitWatererDialog(event) {
+      event.preventDefault();
+      const name = byId("waterer-dialog-name").value.trim();
+      const ip = byId("waterer-dialog-ip").value.trim();
+      const saveButton = byId("waterer-dialog-save");
+      const message = byId("waterer-dialog-message");
+      if (!name) {
+        message.textContent = "Wpisz nazwę poidła.";
+        return;
+      }
+      saveButton.disabled = true;
+      message.textContent = watererDialogMode === "add" ? "Dodaję poidło do centrali…" : "Zapisuję nową nazwę…";
+      try {
+        if (watererDialogMode === "rename") {
+          const target = waterers.find(item => item.id === watererDialogTargetId);
+          if (!target) throw new Error("Nie znaleziono tego poidła.");
+          if (!target.physical) {
+            target.name = name;
+          } else {
+            const response = await fetch("/api/waterers", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "rename", id: target.id, name })
+            });
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.error || "Nie udało się zmienić nazwy.");
+            await loadWatererRegistry();
+          }
+          renderWatererCards("waterer-list");
+          updateWatererCards();
+          updateAlert();
+          byId("waterer-action-status").textContent = "Zmieniono nazwę poidła na „" + name + "”.";
+        } else {
+          if (!ip) throw new Error("Wpisz lokalny adres IP Pico W.");
+          const response = await fetch("/api/waterers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "add", name, ip })
+          });
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.error || "Nie udało się dodać poidła.");
+          await loadWatererRegistry();
+          renderWatererCards("waterer-list");
+          updateAlert();
+          byId("waterer-action-status").textContent = "Dodano poidło „" + name + "”.";
+        }
+        byId("waterer-dialog").close();
+        if (watererDialogMode === "add") goToOverview();
+      } catch (error) {
+        message.textContent = error.message || "Nie udało się zapisać zmian.";
+        saveButton.disabled = false;
+      }
+    }
+
+    async function loadWatererRegistry() {
+      try {
+        const response = await fetch("/api/waterers", { cache: "no-store" });
+        if (!response.ok) throw new Error("Brak listy urządzeń.");
+        const payload = await response.json();
+        const sessionWaterers = waterers.filter(item => !item.physical);
+        const registered = (payload.waterers || []).map(item => ({
+          id: item.id,
+          name: item.name,
+          physical: true,
+          ip: item.ip || "",
+          depth: null,
+          tds: null,
+          natural: false,
+          identifying: false,
+          identifyNote: "",
+          remoteError: false
+        }));
+        waterers.splice(0, waterers.length, ...registered, ...sessionWaterers);
+      } catch (error) {
+        // Widok nadal działa dla głównego Pico W i testowych poideł.
+      }
+      if (!waterers.some(item => item.id === selectedWatererId)) selectedWatererId = waterers[0].id;
+    }
+
+    function updateAlert() {
+      const input = byId("threshold");
+      const threshold = Number(input.value);
+      if (input.value === "" || !Number.isFinite(threshold) || threshold < 0 || threshold > 10) {
+        input.setAttribute("aria-invalid", "true");
+        setPanelAlert("water-alert", "water-alert-message", true, "Ustaw prawidłowy próg poziomu wody od 0 do 10 cm.", "Ustaw próg poziomu wody");
+        return;
+      }
+      input.removeAttribute("aria-invalid");
+      const lowWaterers = waterers.filter(waterer => Number.isFinite(waterer.depth) && waterer.depth < threshold);
+      if (lowWaterers.length) {
+        const names = lowWaterers.map(waterer => waterer.name).join(", ");
+        setPanelAlert("water-alert", "water-alert-message", true, "Poziom wody w „" + names + "” jest poniżej progu " + formatPL(threshold, 1) + " cm. Uzupełnij wodę; komunikat pozostanie, dopóki odczyt nie wzrośnie.", "Zajrzyj do poidełka");
+      } else if (!currentReading || !currentReading.water || !currentReading.water.available || !Number.isFinite(currentReading.water.depth_cm)) {
+        setPanelAlert("water-alert", "water-alert-message", true, "Brak wiarygodnego odczytu poziomu wody. Sprawdź czujnik i poidełko.", "Sprawdź czujnik poziomu");
+      } else {
+        setPanelAlert("water-alert", "water-alert-message", false, "");
+      }
+      updatePanelAlertsVisibility();
+    }
+
+    function setPanelAlert(alertId, messageId, visible, message, title) {
+      const alert = byId(alertId);
+      const messageNode = byId(messageId);
+      const titleNode = alert.querySelector("h3");
+      if (messageNode.textContent !== message) messageNode.textContent = message;
+      if (title && titleNode.textContent !== title) titleNode.textContent = title;
+      alert.hidden = !visible;
+      updatePanelAlertsVisibility();
+    }
+
+    function updatePanelAlertsVisibility() {
+      byId("panel-alerts").hidden = byId("water-alert").hidden && byId("tds-alert").hidden;
+    }
+
+    function updateSessionTdsAlert() {
+      const highWaterers = waterers.filter(waterer => Number.isFinite(waterer.tds) && waterer.tds >= TDS_ALERT_THRESHOLD_PPM);
+      if (highWaterers.length) {
+        const names = highWaterers.map(waterer => waterer.name).join(", ");
+        const values = highWaterers.map(waterer => waterer.name + ": " + formatPL(waterer.tds, 0) + " ppm").join("; ");
+        setPanelAlert("tds-alert", "tds-alert-message", true, "Stały próg alarmu " + TDS_ALERT_THRESHOLD_PPM + " ppm został osiągnięty w: " + values + ". Sprawdź wodę i czujnik. TDS sam nie rozstrzyga o jej zdatności.", "Sprawdź wodę w poidełku");
+      } else if (currentReading && currentReading.tds && currentReading.tds.available && !currentReading.tds.warning && Number.isFinite(currentReading.tds.ppm)) {
+        setPanelAlert("tds-alert", "tds-alert-message", false, "");
+      } else if (currentReading) {
+        setPanelAlert("tds-alert", "tds-alert-message", true, "Brak wiarygodnego odczytu TDS. Sprawdź czujnik oraz jego przewody.", "Sprawdź czujnik TDS");
+      }
+      updatePanelAlertsVisibility();
+    }
+
+    function renderWatererCards(containerId) {
+      const container = byId(containerId);
+      if (!container) return;
+      container.innerHTML = waterers.map(waterer => {
+        const isPhysical = waterer.physical;
+        const kind = isPhysical ? "Pico W · odczyt na żywo" : "poidło testowe · dane sesyjne";
+        const warning = Number.isFinite(waterer.tds) && waterer.tds >= TDS_ALERT_THRESHOLD_PPM;
+        const note = waterer.identifying
+          ? (isPhysical ? "Dioda wskazanego Pico W powinna teraz mrugać." : "To poidło jest wirtualne — identyfikacja jest widoczna tylko tutaj.")
+          : waterer.identifyNote || (waterer.remoteError ? "Brak odpowiedzi z Pico W — sprawdź adres i Wi‑Fi." : warning ? "Przekroczono stały próg alarmu TDS 500 ppm — sprawdź wodę i czujnik." : waterer.natural ? "Tryb naturalny: wartości lekko się zmieniają." : "Próg alarmu TDS jest stały: 500 ppm.");
+        return '<article class="waterer-card' + (waterer.identifying ? ' identifying' : '') + '" data-waterer-card-id="' + escapeHtml(waterer.id) + '">' +
+          '<div class="waterer-top"><div class="waterer-title-row"><span class="waterer-lamp" aria-hidden="true"></span><div><h3 class="waterer-title">' + escapeHtml(waterer.name) + '</h3><p class="waterer-kind">' + kind + '</p></div></div>' +
+          '<details class="waterer-menu"><summary aria-label="Więcej opcji dla ' + escapeHtml(waterer.name) + '">⋮</summary><div class="waterer-menu-content"><button class="waterer-identify" type="button" data-identify-id="' + escapeHtml(waterer.id) + '">' + (waterer.identifying ? 'Stop identyfikacji' : 'Identyfikuj') + '</button><button class="waterer-rename" type="button" data-rename-id="' + escapeHtml(waterer.id) + '">Zmień nazwę</button></div></details></div>' +
+          '<div class="waterer-metrics"><div class="waterer-metric"><span>Poziom wody</span><strong class="waterer-depth-value">' + formatPL(waterer.depth, 1) + ' cm</strong></div>' +
+          '<div class="waterer-metric"><span>TDS</span><strong class="waterer-tds-value">' + formatPL(waterer.tds, 0) + ' ppm</strong></div></div>' +
+          '<p class="waterer-note' + (warning ? ' warning' : '') + '">' + escapeHtml(note) + '</p>' +
+          '<button class="waterer-open" type="button" data-open-waterer-id="' + escapeHtml(waterer.id) + '">Otwórz poidło</button></article>';
+      }).join("");
+    }
+
+    function updateWatererCards() {
+      const container = byId("waterer-list");
+      if (container) {
+        container.querySelectorAll(".waterer-card").forEach(card => {
+          const waterer = waterers.find(item => item.id === card.dataset.watererCardId);
+          if (!waterer) return;
+          const depth = card.querySelector(".waterer-depth-value");
+          const tds = card.querySelector(".waterer-tds-value");
+          const note = card.querySelector(".waterer-note");
+          if (depth) depth.textContent = formatPL(waterer.depth, 1) + " cm";
+          if (tds) tds.textContent = formatPL(waterer.tds, 0) + " ppm";
+          if (note) {
+            note.classList.toggle("warning", Number.isFinite(waterer.tds) && waterer.tds >= TDS_ALERT_THRESHOLD_PPM);
+            note.textContent = waterer.identifying
+              ? (waterer.physical ? "Dioda wskazanego Pico W powinna teraz mrugać." : "To poidło jest wirtualne — identyfikacja jest widoczna tylko tutaj.")
+              : waterer.identifyNote || (waterer.remoteError ? "Brak odpowiedzi z Pico W — sprawdź adres i Wi‑Fi." : Number.isFinite(waterer.tds) && waterer.tds >= TDS_ALERT_THRESHOLD_PPM ? "Przekroczono stały próg alarmu TDS 500 ppm — sprawdź wodę i czujnik." : waterer.natural ? "Tryb naturalny: wartości lekko się zmieniają." : "Próg alarmu TDS jest stały: 500 ppm.");
+          }
+          card.classList.toggle("identifying", waterer.identifying);
+          const button = card.querySelector(".waterer-identify");
+          if (button) button.textContent = waterer.identifying ? "Stop identyfikacji" : "Identyfikuj";
+        });
+      }
+      const selected = getSelectedWaterer();
+      if (selected) {
+        byId("detail-waterer-name").textContent = selected.name;
+        const button = byId("detail-identify-button");
+        button.textContent = selected.identifying ? "Stop identyfikacji" : "Identyfikuj diodę";
+        button.classList.toggle("identifying", selected.identifying);
+      }
+      updateSessionTdsAlert();
+    }
+
+    function identifyEndpoint(waterer, action) {
+      if (!waterer.physical) return null;
+      return "/api/waterers/" + encodeURIComponent(waterer.id) + "/identify/" + action;
+    }
+
+    async function sendIdentifyCommand(waterer, action) {
+      const endpoint = identifyEndpoint(waterer, action);
+      if (!endpoint) return { localOnly: true };
+      const response = await fetch(endpoint, { cache: "no-store" });
+      if (!response.ok) throw new Error("Pico W nie odpowiedziało na polecenie identyfikacji.");
+      return { localOnly: false };
+    }
+
+    async function toggleIdentify(id) {
+      const waterer = waterers.find(item => item.id === id);
+      if (!waterer) return;
+      const action = waterer.identifying ? "stop" : "start";
+      waterer.identifyNote = "";
+      waterer.identifying = action === "start";
+      updateWatererCards();
+      try {
+        const result = await sendIdentifyCommand(waterer, action);
+        if (result.localOnly && action === "start") waterer.identifyNote = "Testowa animacja ekranu; do mrugania lampką potrzebne jest Pico W.";
+      } catch (error) {
+        waterer.identifying = false;
+        waterer.identifyNote = "Centrala nie może połączyć się z tym Pico W. Sprawdź jego IP i Wi‑Fi.";
+      }
+      updateWatererCards();
+    }
+
+    async function stopSessionChanges() {
+      const active = waterers.filter(waterer => waterer.identifying);
+      await Promise.all(active.map(waterer => sendIdentifyCommand(waterer, "stop").catch(() => null)));
+      for (let index = waterers.length - 1; index >= 0; index--) {
+        if (!waterers[index].physical) waterers.splice(index, 1);
+        else {
+          waterers[index].identifying = false;
+          waterers[index].identifyNote = "";
+        }
+      }
+      renderWatererCards("waterer-list");
+      updateAlert();
+      updateSessionTdsAlert();
+      byId("admin-message").textContent = "Zatrzymano identyfikację i usunięto poidła testowe z tej sesji.";
+    }
+
+    function stepNaturalValues() {
+      waterers.forEach(waterer => {
+        if (waterer.physical || !waterer.natural) return;
+        waterer.depth = Math.max(0, Math.min(10, waterer.depth + (Math.random() - 0.5) * 0.28));
+        waterer.tds = Math.max(0, Math.min(10000, waterer.tds + (Math.random() - 0.5) * 22));
+      });
+      updateWatererCards();
+      updateAlert();
+    }
+
+    function isAdminRoute() {
+      return window.location.pathname.replace(/\/+$/, "").toLowerCase() === "/admin";
+    }
+
+    function supportsAdminPath() {
+      return window.location.protocol === "http:" || window.location.protocol === "https:";
+    }
+
+    function showAdminRoute() {
+      byId("admin-page").hidden = false;
+      byId("setup-guide").hidden = true;
+      byId("overview-page").hidden = true;
+      byId("dashboard").hidden = true;
+    }
+
+    function showOverviewRoute() {
+      overviewShowing = true;
+      byId("admin-page").hidden = true;
+      byId("setup-guide").hidden = true;
+      byId("dashboard").hidden = true;
+      byId("overview-page").hidden = false;
+      byId("overview-device-count").textContent = waterers.length + (waterers.length === 1 ? " poidło" : " poidła");
+      renderWatererCards("waterer-list");
+      refreshReadings();
+    }
+
+    function showDetailRoute(id) {
+      const selected = waterers.find(item => item.id === id) || waterers[0];
+      if (!selected) return;
+      overviewShowing = false;
+      selectedWatererId = selected.id;
+      byId("admin-page").hidden = true;
+      byId("setup-guide").hidden = true;
+      byId("overview-page").hidden = true;
+      byId("dashboard").hidden = false;
+      byId("detail-back-button").hidden = waterers.length <= 1;
+      byId("detail-waterer-name").textContent = selected.name;
+      updateWatererCards();
+      refreshReadings();
+    }
+
+    function showMainRoute() {
+      byId("admin-page").hidden = true;
+      const installed = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+      const guideDone = getSaved("ptasia-kropla-guide-done", "0") === "1";
+      const ready = installed || guideDone;
+      byId("setup-guide").hidden = ready;
+      if (!ready) {
+        byId("overview-page").hidden = true;
+        byId("dashboard").hidden = true;
+        return;
+      }
+      const requestedId = new URLSearchParams(window.location.search).get("waterer");
+      if (waterers.length > 1 && (!requestedId || !waterers.some(item => item.id === requestedId))) {
+        showOverviewRoute();
+        return;
+      }
+      const selected = waterers.find(item => item.id === requestedId) || waterers[0];
+      if (selected) showDetailRoute(selected.id);
+    }
+
+    function goToAdmin() {
+      if (supportsAdminPath() && !isAdminRoute()) window.history.pushState({}, "", "/admin");
+      showAdminRoute();
+    }
+
+    function goToMain() {
+      if (supportsAdminPath() && (isAdminRoute() || window.location.search)) window.history.pushState({}, "", "/");
+      showMainRoute();
+    }
+
+    function goToWaterer(id) {
+      const waterer = waterers.find(item => item.id === id);
+      if (!waterer) return;
+      if (supportsAdminPath()) window.history.pushState({}, "", "/?waterer=" + encodeURIComponent(id));
+      showDetailRoute(id);
+    }
+
+    function goToOverview() {
+      if (supportsAdminPath()) window.history.pushState({}, "", "/");
+      showOverviewRoute();
+    }
+
+    function showCurrentRoute() {
+      if (isAdminRoute()) showAdminRoute();
+      else showMainRoute();
+    }
+
+    function updateTdsThresholdVisual() {
+      const zone = byId("tds-danger-zone");
+      const line = byId("tds-threshold-marker");
+      const position = TDS_ALERT_THRESHOLD_PPM / TDS_SCALE_MAX * 100;
+      zone.style.left = position + "%";
+      zone.style.width = (100 - position) + "%";
+      zone.hidden = false;
+      line.style.left = position + "%";
+      line.hidden = false;
+      return TDS_ALERT_THRESHOLD_PPM;
+    }
+
+    function render(data, waterer) {
+      waterer = waterer || getSelectedWaterer();
+      currentReading = data;
+      const water = data.water || {};
+      const tds = data.tds || {};
+      waterer.depth = water.available && Number.isFinite(water.depth_cm) ? water.depth_cm : null;
+      waterer.tds = tds.available && !tds.warning && Number.isFinite(tds.ppm) ? tds.ppm : null;
+      waterer.remoteError = waterer.physical && data.wifi_connected !== true;
+      waterer.identifyNote = "";
+      byId("detail-waterer-name").textContent = waterer.name;
+      const online = !waterer.physical || data.wifi_connected === true;
+      const deviceBadge = byId("device-status");
+      deviceBadge.textContent = online ? (waterer.physical ? "Pico W połączone" : "Dane testowe") : "Pico W offline";
+      deviceBadge.className = "badge " + (online ? "ok" : "error");
+      byId("connection-description").textContent = online
+        ? (waterer.physical && waterer.id !== "pico-main" ? "Odczyty tego Pico W są przekazywane przez centralny panel." : "Panel korzysta ze wspólnego adresu centrali Ptasia Kropla.")
+        : "Centrala nie otrzymuje odpowiedzi z tego Pico W. Sprawdź IP i połączenie Wi‑Fi.";
+      byId("wifi-address").textContent = window.location.origin && window.location.origin !== "null" ? window.location.origin : "brak wspólnego adresu";
+
+      if (water.available && typeof water.depth_cm === "number") {
+        const depth = Math.max(0, Math.min(10, water.depth_cm));
+        const percent = Math.max(0, Math.min(100, Number(water.percent) || 0));
+        byId("water-percent").textContent = Math.round(percent);
+        byId("water-depth").textContent = formatPL(depth, 1);
+        byId("water-fill").style.height = percent + "%";
+        byId("water-caption").textContent = "Odczyt z czujnika poziomu wody.";
+        setPill("level-sensor-status", "działa", "ok");
+      } else {
+        byId("water-percent").textContent = "—";
+        byId("water-depth").textContent = "—";
+        byId("water-fill").style.height = "0%";
+        byId("water-caption").textContent = "Brak odczytu — sprawdź połączenie czujnika.";
+        setPill("level-sensor-status", "brak odczytu", "error");
+      }
+
+      if (tds.available && !tds.warning && Number.isFinite(tds.ppm)) {
+        byId("tds-value").textContent = Math.round(tds.ppm);
+        byId("tds-caption").textContent = "Wartość orientacyjna; napięcie " + formatPL(tds.voltage, 3) + " V.";
+        setPill("tds-sensor-status", "działa", "ok");
+        updateTdsScale(tds.ppm);
+      } else if (tds.available && tds.warning) {
+        byId("tds-value").textContent = "—";
+        byId("tds-caption").textContent = "Napięcie " + formatPL(tds.voltage, 3) + " V jest poza oczekiwanym zakresem. Sprawdź przewód sygnałowy.";
+        setPill("tds-sensor-status", "sprawdź", "warn");
+        clearTdsScale("Sprawdź czujnik i zakres napięcia.");
+      } else {
+        byId("tds-value").textContent = "—";
+        byId("tds-caption").textContent = "Brak odczytu — sprawdź czujnik TDS.";
+        setPill("tds-sensor-status", "brak odczytu", "error");
+        clearTdsScale("Brak odczytu TDS.");
+      }
+
+      byId("battery-state").textContent = "Stan baterii: brak pomiaru";
+      byId("last-read").textContent = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date());
+      history.push({ time: new Date(), water: water.available ? water.depth_cm : null, tds: tds.available && !tds.warning ? tds.ppm : null });
+      if (history.length > 24) history.shift();
+      updateAlert();
+      drawChart();
+      updateWatererCards();
+    }
+
+    function drawChart() {
+      const canvas = byId("history-chart");
+      const bounds = canvas.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(bounds.width * ratio);
+      canvas.height = Math.floor(bounds.height * ratio);
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const width = bounds.width, height = bounds.height;
+      const pad = { left: 40, right: 40, top: 16, bottom: 28 };
+      const plotW = width - pad.left - pad.right, plotH = height - pad.top - pad.bottom;
+      ctx.clearRect(0, 0, width, height);
+      ctx.font = "11px Segoe UI, Arial, sans-serif";
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "#e6efee";
+      ctx.fillStyle = "#71868c";
+      for (let tick = 0; tick <= 2; tick++) {
+        const y = pad.top + plotH * tick / 2;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(width - pad.right, y); ctx.stroke();
+        ctx.fillText(String(10 - tick * 5), 8, y + 4);
+      }
+      ctx.fillText("cm", 8, 11); ctx.fillText("ppm", width - 31, 11);
+      if (!history.length) {
+        ctx.textAlign = "center"; ctx.fillText("Wykres pojawi się po pierwszym odczycie.", width / 2, height / 2); ctx.textAlign = "left";
+        return;
+      }
+      const validTds = history.map(item => item.tds).filter(value => typeof value === "number");
+      const tdsMax = Math.max(300, ...(validTds.length ? validTds : [300])) * 1.1;
+      const xFor = index => pad.left + (history.length < 2 ? plotW / 2 : plotW * index / (history.length - 1));
+      function drawSeries(key, color, maxValue) {
+        ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        let drawing = false;
+        history.forEach((item, index) => {
+          const value = item[key];
+          if (typeof value !== "number" || !Number.isFinite(value)) { drawing = false; return; }
+          const y = pad.top + plotH * (1 - Math.max(0, Math.min(maxValue, value)) / maxValue);
+          if (!drawing) { ctx.moveTo(xFor(index), y); drawing = true; } else { ctx.lineTo(xFor(index), y); }
+        });
+        ctx.stroke();
+      }
+      drawSeries("water", "#0a91a4", 10); drawSeries("tds", "#74a783", tdsMax);
+      ctx.fillStyle = "#71868c";
+      const first = history[0].time.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
+      const last = history[history.length - 1].time.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
+      ctx.fillText(first, pad.left, height - 6);
+      ctx.fillText(last, width - pad.right - ctx.measureText(last).width, height - 6);
+    }
+
+    function updateTdsScale(ppm) {
+      const status = byId("tds-assessment");
+      const marker = byId("tds-marker");
+      updateTdsThresholdVisual();
+      const boundedPpm = Math.max(0, Math.min(TDS_SCALE_MAX, ppm));
+      const level = Math.min(10, Math.floor(boundedPpm / (TDS_SCALE_MAX / 10)) + 1);
+      const levelNames = ["najniższy TDS", "niski TDS", "niski TDS", "umiarkowany TDS", "umiarkowany TDS", "podwyższony TDS", "podwyższony TDS", "wysoki TDS", "bardzo wysoki TDS", "najwyższy TDS"];
+      marker.style.left = Math.max(0, Math.min(100, ppm / TDS_SCALE_MAX * 100)) + "%";
+      marker.style.visibility = "visible";
+      if (ppm >= TDS_ALERT_THRESHOLD_PPM) {
+        status.textContent = "Próg alarmowy TDS przekroczony";
+        status.className = "tds-assessment high";
+        setPanelAlert("tds-alert", "tds-alert-message", true, "Odczyt osiągnął lub przekroczył stały próg alarmowy " + formatPL(TDS_ALERT_THRESHOLD_PPM, 0) + " ppm. Zajrzyj do poidełka i sprawdź wodę oraz czujnik. TDS sam nie rozstrzyga o jej zdatności.", "Sprawdź wodę w poidełku");
+      } else {
+        status.textContent = "Poziom " + level + "/10 — " + levelNames[level - 1];
+        status.className = "tds-assessment " + (level <= 3 ? "low" : level <= 7 ? "medium" : "high");
+        setPanelAlert("tds-alert", "tds-alert-message", false, "");
+      }
+      updatePanelAlertsVisibility();
+    }
+
+    function clearTdsScale(message) {
+      byId("tds-marker").style.visibility = "hidden";
+      const status = byId("tds-assessment");
+      status.textContent = message;
+      status.className = "tds-assessment medium";
+      updateTdsThresholdVisual();
+      setPanelAlert("tds-alert", "tds-alert-message", true, message + " Komunikat zniknie po uzyskaniu prawidłowego odczytu.", "Sprawdź czujnik TDS");
+      updatePanelAlertsVisibility();
+    }
+
+    async function refreshReadings() {
+      if (requestRunning || (byId("dashboard").hidden && byId("overview-page").hidden)) return;
+      requestRunning = true;
+      const button = byId("refresh-button");
+      if (button) button.disabled = true;
+      try {
+        const response = await fetch("/api/waterers/readings", { cache: "no-store" });
+        if (!response.ok) throw new Error("Centrala zwróciła błąd " + response.status);
+        const payload = await response.json();
+        const readings = new Map((payload.waterers || []).map(item => [item.id, item.reading]));
+        waterers.filter(item => item.physical).forEach(waterer => {
+          const reading = readings.get(waterer.id);
+          waterer.remoteError = !reading || reading.wifi_connected !== true;
+          waterer.depth = reading && reading.water && reading.water.available && Number.isFinite(reading.water.depth_cm) ? reading.water.depth_cm : null;
+          waterer.tds = reading && reading.tds && reading.tds.available && !reading.tds.warning && Number.isFinite(reading.tds.ppm) ? reading.tds.ppm : null;
+        });
+        if (!byId("dashboard").hidden) {
+          const selected = getSelectedWaterer();
+          let data = readings.get(selected.id);
+          if (!selected.physical) {
+            data = {
+              wifi_connected: true,
+              ip: null,
+              water: { available: true, percent: Math.round(selected.depth * 10), depth_cm: selected.depth },
+              tds: { available: true, warning: false, ppm: selected.tds, voltage: null },
+              battery: { available: false, label: "Brak pomiaru" }
+            };
+          }
+          if (!data) data = { wifi_connected: false, water: {}, tds: {}, battery: { available: false, label: "Brak pomiaru" } };
+          render(data, selected);
+        } else {
+          updateWatererCards();
+          updateAlert();
+        }
+      } catch (error) {
+        const badge = byId("device-status");
+        badge.textContent = "Brak odpowiedzi Pico W";
+        badge.className = "badge error";
+        waterers.filter(item => item.physical).forEach(waterer => { waterer.depth = null; waterer.tds = null; waterer.remoteError = true; });
+        updateWatererCards();
+        byId("connection-description").textContent = "Nie udało się pobrać odczytów. Upewnij się, że urządzenia są w tej samej sieci Wi‑Fi.";
+        byId("wifi-address").textContent = window.location.origin || "brak wspólnego adresu";
+        byId("last-read").textContent = "brak odpowiedzi";
+      } finally {
+        requestRunning = false;
+        if (button) button.disabled = false;
+      }
+    }
+
+    const guideContent = [
+      {
+        title: "Otwórz adres w Safari",
+        copy: "Ten wspólny adres prowadzi do centrali Ptasia Kropla i obsługuje wszystkie dodane poidła. Skopiuj adres, otwórz Safari na iPhonie i wklej go w pasek adresu. iPhone i Pico W muszą być w tej samej sieci Wi‑Fi.",
+        body: '<p>1. Skopiuj wspólny adres poniżej.</p><p>2. Otwórz Safari i wklej go w pasek adresu.</p><p>3. Dodatkowe Pico W dodaj później przyciskiem „＋ Dodaj poidło” na panelu głównym. Do Safari nadal wpisujesz tylko wspólny adres centrali.</p>'
+      },
+      {
+        title: "Wybierz wygląd Safari",
+        copy: "Wybierz wersję systemu, która jest na Twoim iPhonie. Poniżej znajdziesz krótką instrukcję tekstową.",
+        body: '<p>Wybierz iOS 26 albo iOS 27. Możesz zmienić wybór w dowolnym momencie.</p>'
+      },
+      {
+        title: "Otwórz menu Udostępnij",
+        copy: "W Safari dotknij przycisku udostępniania. Zależnie od układu paska możesz go znaleźć na dolnym pasku albo w menu strony.",
+        body: '<ol><li><strong>iOS 26:</strong> dotknij ikony udostępniania na dolnym pasku Safari. Jeśli jej nie widać, otwórz menu strony i wybierz „Udostępnij”.</li><li><strong>iOS 27:</strong> otwórz menu strony (trzy kropki/kreski), a następnie dotknij „Udostępnij”.</li></ol>'
+      },
+      {
+        title: "Zjedź na dół listy",
+        copy: "W arkuszu udostępniania przewiń listę czynności aż do samego dołu i wybierz „Edycja czynności”.",
+        body: '<ol><li>Przesuń listę opcji w górę, aż dojdziesz do końca.</li><li>Dotknij „Edycja czynności”.</li></ol>'
+      },
+      {
+        title: "Dodaj pozycję do ekranu",
+        copy: "Znajdź „Dodaj do ekranu początkowego”. Dotknij zielonego plusa, a potem zatwierdź niebieskim znakiem wyboru, jeśli pojawi się w Twojej wersji iOS.",
+        body: '<ol><li>Odszukaj „Dodaj do ekranu początkowego”.</li><li>Dotknij zielonego plusa.</li><li>Jeśli edytujesz listę czynności, zatwierdź zmiany niebieskim znakiem wyboru.</li></ol>'
+      },
+      {
+        title: "Wróć na górę i wybierz dodawanie",
+        copy: "Po zatwierdzeniu edycji czynności wróć do arkusza udostępniania. Przewiń go na samą górę i dotknij „Dodaj do ekranu początkowego”.",
+        body: '<ol><li>Wróć do arkusza udostępniania.</li><li>Przewiń listę opcji na samą górę.</li><li>Dotknij „Dodaj do ekranu początkowego”.</li></ol>'
+      },
+      {
+        title: "Dodaj ikonę Ptasia Kropla",
+        copy: "W podglądzie wpisz nazwę „Ptasia Kropla”, a następnie dotknij „Dodaj”.",
+        body: '<ol><li>Jeśli trzeba, przewiń podgląd na górę.</li><li>W polu nazwy wpisz tylko <strong>Ptasia Kropla</strong>.</li><li>Dotknij „Dodaj”.</li></ol>'
+      },
+      {
+        title: "Gotowe — ikona jest na ekranie głównym",
+        copy: "Znajdź ikonę Ptasia Kropla na ekranie głównym i otwórz ją, aby przejść do panelu poidełka.",
+        body: '<p>Ikona powinna mieć logo ptaka i podpis <strong>Ptasia Kropla</strong>. Dotknij jej na iPhonie, aby otworzyć panel.</p>'
+      }
+    ];
+
+    function addressForGuide() {
+      return window.location.origin && window.location.origin !== "null" ? window.location.origin + "/" : window.location.href;
+    }
+
+    function renderGuide() {
+      const step = guideContent[Math.min(guideStep, guideContent.length - 1)];
+      byId("guide-title").textContent = step.title;
+      byId("guide-copy").textContent = step.copy;
+      byId("step-copy").innerHTML = step.body;
+      byId("guide-progress").innerHTML = guideContent.map((_, index) => '<span class="' + (index <= guideStep ? "active" : "") + '"></span>').join("");
+      byId("address-panel").hidden = guideStep !== 0;
+      byId("version-panel").hidden = guideStep !== 1;
+      byId("tutorial-layout").hidden = guideStep < 2;
+      byId("guide-back").hidden = guideStep === 0;
+      byId("guide-next").textContent = guideStep === guideStepCount - 1 ? "Otwórz panel" : "Dalej";
+      if (guideStep === 0) byId("site-address").value = addressForGuide();
+      document.querySelectorAll(".version-button").forEach(button => {
+        button.classList.toggle("selected", button.dataset.ios === iosVersion);
+      });
+    }
+
+    async function copyAddress() {
+      const input = byId("site-address");
+      const value = addressForGuide();
+      input.value = value;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+        } else {
+          input.focus();
+          input.select();
+          if (!document.execCommand("copy")) throw new Error("Skopiuj zaznaczony adres ręcznie.");
+        }
+        byId("address-status").textContent = "Adres skopiowany. Wklej go w Safari na iPhonie.";
+      } catch (error) {
+        input.focus();
+        input.select();
+        byId("address-status").textContent = "Zaznaczyłem adres — przytrzymaj go i wybierz Kopiuj.";
+      }
+    }
+
+    function nextGuideStep() {
+      if (guideStep < guideStepCount - 1) {
+        guideStep += 1;
+        renderGuide();
+      } else {
+        showDashboard();
+      }
+    }
+
+    async function initApp() {
+      const savedThreshold = getSaved("ptasia-kropla-threshold", "2");
+      byId("threshold").value = savedThreshold;
+      updateTdsThresholdVisual();
+      const ua = navigator.userAgent || "";
+      const versionMatch = ua.match(/OS (\d+)[._]/);
+      if (versionMatch && Number(versionMatch[1]) >= 27) iosVersion = "27";
+      await loadWatererRegistry();
+      renderWatererCards("waterer-list");
+      showCurrentRoute();
+      renderGuide();
+
+      if (window.isSecureContext && "serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service-worker.js?v=10").catch(() => {});
+      }
+      window.setInterval(refreshReadings, 2500);
+      window.setInterval(stepNaturalValues, 1800);
+      refreshReadings();
+    }
+
+    byId("copy-address").addEventListener("click", copyAddress);
+    byId("guide-next").addEventListener("click", nextGuideStep);
+    byId("guide-back").addEventListener("click", () => { if (guideStep > 0) { guideStep -= 1; renderGuide(); } });
+    document.querySelectorAll(".version-button").forEach(button => {
+      button.addEventListener("click", () => { iosVersion = button.dataset.ios; renderGuide(); });
+    });
+    byId("show-guide").addEventListener("click", openGuide);
+    byId("refresh-button").addEventListener("click", refreshReadings);
+    byId("show-admin").addEventListener("click", goToAdmin);
+    byId("overview-admin").addEventListener("click", goToAdmin);
+    byId("admin-home-button").addEventListener("click", goToMain);
+    byId("overview-guide").addEventListener("click", openGuide);
+    byId("detail-back-button").addEventListener("click", goToOverview);
+    byId("overview-add-waterer").addEventListener("click", () => openWatererDialog("add"));
+    byId("detail-add-waterer").addEventListener("click", () => openWatererDialog("add"));
+    byId("detail-rename-waterer").addEventListener("click", () => openWatererDialog("rename", selectedWatererId));
+    byId("waterer-dialog-form").addEventListener("submit", submitWatererDialog);
+    byId("waterer-dialog-cancel").addEventListener("click", () => byId("waterer-dialog").close());
+    byId("waterer-dialog-close").addEventListener("click", () => byId("waterer-dialog").close());
+    byId("waterer-dialog").addEventListener("click", event => {
+      if (event.target === byId("waterer-dialog")) byId("waterer-dialog").close();
+    });
+    byId("detail-identify-button").addEventListener("click", () => toggleIdentify(selectedWatererId));
+    window.addEventListener("popstate", showCurrentRoute);
+    byId("threshold").addEventListener("input", () => {
+      try { localStorage.setItem("ptasia-kropla-threshold", byId("threshold").value); } catch (error) {}
+      updateAlert();
+    });
+    byId("admin-login-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const username = byId("admin-username").value.trim();
+      const password = byId("admin-password").value;
+      if (username === "admin" && password === "admin") {
+        adminUnlocked = true;
+        byId("admin-login-panel").hidden = true;
+        byId("admin-controls").hidden = false;
+        byId("admin-message").textContent = "Zalogowano. Ustawienia testowych poideł działają tylko na tę sesję.";
+      } else {
+        byId("admin-login-message").textContent = "Nieprawidłowy login lub hasło.";
+      }
+    });
+    byId("waterer-natural-toggle").addEventListener("click", () => {
+      formNaturalMode = !formNaturalMode;
+      byId("waterer-natural-toggle").setAttribute("aria-pressed", String(formNaturalMode));
+      byId("waterer-natural-toggle").textContent = "Tryb naturalny: " + (formNaturalMode ? "włączony" : "wyłączony");
+    });
+    byId("waterer-form").addEventListener("submit", event => {
+      event.preventDefault();
+      if (!adminUnlocked) return;
+      const name = byId("waterer-name").value.trim();
+      const tds = Number(byId("waterer-tds").value);
+      const depth = Number(byId("waterer-depth").value);
+      if (!name || !Number.isFinite(tds) || tds < 0 || tds > 10000 || !Number.isFinite(depth) || depth < 0 || depth > 10) {
+        byId("admin-message").textContent = "Sprawdź nazwę oraz zakresy TDS (0–10000 ppm) i poziomu (0–10 cm).";
+        return;
+      }
+      waterers.push({
+        id: "session-" + watererSerial++, name, physical: false,
+        depth, tds, natural: formNaturalMode,
+        identifying: false, identifyNote: "", remoteError: false
+      });
+      renderWatererCards("waterer-list");
+      updateAlert();
+      updateSessionTdsAlert();
+      byId("admin-message").textContent = "Dodano testowe „" + name + "”. Wybierz Panel główny, aby zobaczyć listę poideł.";
+      byId("waterer-name").value = "Poidło testowe";
+    });
+    byId("stop-session-button").addEventListener("click", stopSessionChanges);
+    byId("waterer-list").addEventListener("click", event => {
+        const renameButton = event.target.closest("[data-rename-id]");
+        if (renameButton) {
+          openWatererDialog("rename", renameButton.dataset.renameId);
+          return;
+        }
+        const button = event.target.closest("[data-identify-id]");
+        if (button) toggleIdentify(button.dataset.identifyId);
+        const openButton = event.target.closest("[data-open-waterer-id]");
+        if (openButton) goToWaterer(openButton.dataset.openWatererId);
+    });
+    window.addEventListener("pagehide", () => {
+      waterers.filter(waterer => waterer.identifying).forEach(waterer => {
+        const endpoint = identifyEndpoint(waterer, "stop");
+        if (endpoint) fetch(endpoint, { cache: "no-store", keepalive: true }).catch(() => {});
+      });
+    });
+    window.addEventListener("resize", drawChart);
+    initApp();
+  </script>
+</body>
+</html>
